@@ -1,2 +1,10 @@
-# clock
-Apenas um relogio que uso no terminal para me mostrar a hora e algumas anotações para eu não me esquecer de ir ao banheiro
+## Um relogio que fiz porque tava atoa
+
+
+- Executando normalmente com python
+> python2 init.py
+
+- Iniciando junto ao terminal
+> echo "python <diretorio onde o codigo ta>/clock/init.py" >> ~/.bashrc
+  
+ 
