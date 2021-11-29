@@ -5,8 +5,71 @@ from baterry import *
 from numbers import *
 from datetime import date
 from datetime import datetime
+import requests, getpass
 
 
+def mes_anual():
+	home = "/home/"+getpass.getuser()
+
+
+	meses = ['Janeiro'
+	,'Fevereiro'
+	,'Março'
+	,'Abril'
+	,'Maio'
+	,'Junho'
+	,'Julho'
+	,'Agosto'
+	,'Setembro'
+	,'Outubro'
+	,'Novembro'
+	,'Dezembro']
+
+
+	agent = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4634.49 Safari/537.36'}
+	get = requests.get("https://icalendario.br.com", headers=agent)
+	html = get.text
+
+	days = 'S  T  Q  Q  S  S  D'
+
+	file = open(home+'/.clock/mes', 'w')
+	file.write(str(datetime.today()).split('-')[0]+'\n\n')
+	file.flush()
+
+	mesnum = 1
+	for mes in meses:
+		mes = html.encode('UTF-8').split('class="month"><caption>'+mes+'</caption>')[1].split('</tbody></table>')[0]
+		espaco = len(mes.split('>1<')[0].split('<td class="nope">&nbsp;</td>')) - 1
+
+                mesnome = '\n\n['+str(espaco)+']['+str(mesnum)+'] '+mes+'\n'
+                file.write(mesnome)
+                file.flush()
+
+                mesnum += 1
+
+		id = 0
+		for num in mes.split('<span class="d">'): # <td class=""><span class="d">
+			try:
+
+				if len(num.split('</span></td>')[0]) == 1:
+#					sys.stderr.write("0"+num.split('</span></td>')[0]+' ')
+					id += 1
+					file.write("0"+str(id)+"-")
+					file.flush()
+
+				elif len(num.split('</span></td>')[0]) == 2:
+#					sys.stderr.write(num.split('</span></td>')[0]+" ")
+					id += 1
+                                        file.write(str(id)+"-")
+                                        file.flush()
+
+			except:
+				None
+
+	file.close()
+
+
+#mes_anual()
 
 def help():
 	global global_help, help_c_note, help_d_note
@@ -133,15 +196,9 @@ def baterry():
 		print "Pls install [acpi]"
 		exit(0)
 
-	elif 'No support' in level:
-		porc = "pc"
-		ba = pc()
-		col = cor.negrito+cor.verde
-                sys.stderr.write(col+ba.n1+cor.finaliza+"\t\t         "+cor.negrito+str(data)+cor.finaliza+'\n'+col+ba.n2+'\n'+ba.n3+cor.finaliza+cor.negrito+"Note: "+str(note1)+cor.finaliza+col+'\n'+ba.n4+'\n'+ba.n5+cor.finaliza+cor.negrito+"Note: "+str(note2)+cor.finaliza+col+'\n'+ba.n6+'\n'+ba.n7+cor.finaliza+cor.negrito+"Note: "+str(note3)+cor.finaliza+col+'\n'+ba.n8+'\n'+ba.n9+cor.finaliza+"\n")
 
 	else:
 			porc = str(level.split(" ")[3].replace("%", "").replace(",", "").replace("\n", ""))
-			print level
 			if level.split(" ")[2] == "Charging,":
 				icon = "↑"
 			elif level.split(" ")[2] == "Full,":
@@ -457,12 +514,108 @@ def seg():
 	sys.stderr.write(cor.negrito+"--------------------------------------------------------------------------------\n\n"+cor.finaliza+h11+h21+"    "+m11+m21+"    "+s11+s21+'\n'+h12+h22+" ## "+m12+m22+" ## "+s12+s22+'\n'+h13+h23+" ## "+m13+m23+" ## "+s13+s23+'\n'+h14+h24+"    "+m14+m24+"    "+s14+s24+'\n'+h15+h25+"    "+m15+m25+"    "+s15+s25+'\n'+h16+h26+" ## "+m16+m26+" ## "+s16+s26+'\n'+h17+h27+" ## "+m17+m27+" ## "+s17+s27+'\n'+h18+h28+"    "+m18+m28+"    "+s18+s28+'\n'+h19+h29+"    "+m19+m29+"    "+s19+s29+cor.negrito+"\n\n--------------------------------------------------------------------------------\n"+cor.finaliza)
 
 	baterry()
-	print cor.negrito+"--------------------------------------------------------------------------------\n\n"+cor.finaliza
+	print cor.negrito+"--------------------------------------------------------------------------------"
+
+
+def calendario():
+        meses = ['Janeiro'
+        ,'Fevereiro'
+        ,'Março'
+        ,'Abril'
+        ,'Maio'
+        ,'Junho'
+        ,'Julho'
+        ,'Agosto'
+        ,'Setembro'
+        ,'Outubro'
+        ,'Novembro'
+        ,'Dezembro']
+
+
+	home = "/home/"+getpass.getuser()
+
+	mes = int(str(datetime.today()).split('-')[1])
+
+# ------------------- MES ATUAL
+	file = open(home+"/.clock/mes")
+	dias = len(file.read().split('][' + str(mes) + "]")[1].split(']['+str(mes+1)+"]")[0].split('-')) - 1
+	file.close()
+
+        file = open(home+"/.clock/mes")
+	espaco = int(file.read().split(']['+str(mes)+"]")[0].split('[')[-1].replace(']', ''))
+	file.close()
+
+# ------------------- MES SEGUINTE
+	if mes != 12:
+	        file = open(home+"/.clock/mes")
+	        dias2 = len(file.read().split('][' + str(mes + 1) + "]")[1].split(']['+str(mes+1)+"]")[0].split('-')) - 1
+	        file.close()
+
+	        file = open(home+"/.clock/mes")
+	        espaco2 = int(file.read().split(']['+str(mes + 1)+"]")[0].split('[')[-1].replace(']', ''))
+	        file.close()
+		seguinte = True
+	else:
+		seguinte = False
+# ------------------- MES ANTERIOR
+	if mes != 1:
+	        file = open(home+"/.clock/mes")
+	        dias3 = len(file.read().split('][' + str(mes - 1) + "]")[1].split(']['+str(mes+1)+"]")[0].split('-')) - 1
+	        file.close()
+
+	        file = open(home+"/.clock/mes")
+	        espaco3 = int(file.read().split(']['+str(mes - 1)+"]")[0].split('[')[-1].replace(']', ''))
+	        file.close()
+		anterior = True
+	else:
+		anterior = False
+
+
+	print '      '+meses[mes-1]
+	print "S  T  Q  Q  S  S  D"
+	id = 0
+	id2 = 0
+	day = 1
+	for dia in range(1, dias + espaco + 1):
+		if id == 7:
+			id = 0
+			sys.stderr.write(' |')
+			print
+
+		if id2 < espaco:
+			sys.stderr.write('   ')
+
+		else:
+			if len(str(day)) == 1:
+				sys.stderr.write('0'+str(day)+' ')
+			else:
+				sys.stderr.write(str(day)+' ')
+			day +=1
+
+		id+=1
+		id2 += 1
+
+	print "\n\n--------------------------------------------------------------------------------"+cor.finaliza
+
 def init():
+	home = "/home/"+getpass.getuser()
+        if os.path.isdir(home+'/.clock/') == False:
+                os.mkdir(home+'/.clock/')
+
 	anot()
 	global cor
 	cor = cores.cores()
 	seg()
+	ano = str(datetime.today()).split('-')[0]
+	file = open(home+'/.clock/mes')
+	if ano not in file.read():
+		file.close()
+		mes_anual()
+
+	file.close()
+
+	calendario()
+
 
 
 init()
